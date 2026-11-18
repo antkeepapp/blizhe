@@ -1,0 +1,737 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#edf0e7">
+<meta name="description" content="Ближе — игра с вопросами для тёплого общения и знакомства друг с другом.">
+<title>Ближе — игра для общения</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{--bg:#edf0e7;--paper:#fbfaf5;--ink:#304936;--muted:#718071;--accent:#55765a;--accent2:#789276;--line:#dce3d7;--shadow:0 18px 50px rgba(48,73,54,.10)}
+*{box-sizing:border-box}html{min-height:100%;background:var(--bg)}body{margin:0;min-height:100vh;color:var(--ink);font-family:"Nunito","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;background:radial-gradient(ellipse at 10% 5%,rgba(255,255,255,.9),transparent 35%),radial-gradient(ellipse at 90% 80%,rgba(199,214,190,.45),transparent 34%),var(--bg);-webkit-font-smoothing:antialiased}
+button{font:inherit;cursor:pointer}button:focus-visible{outline:3px solid #9bb89a;outline-offset:3px}
+.app{width:100%;max-width:560px;min-height:100svh;margin:auto;padding:20px 20px calc(24px + env(safe-area-inset-bottom));display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;padding:5px 0 18px}.brand-logo{display:grid;place-items:center;width:56px;height:56px;text-decoration:none;transition:transform .2s ease}.brand-logo svg{width:56px;height:56px;filter:drop-shadow(0 3px 5px rgba(60,85,60,.09))}.brand-logo:active{transform:scale(.94)}.iconbtn{border:1px solid var(--line);background:rgba(255,255,255,.58);color:var(--ink);width:42px;height:42px;border-radius:50%;font-size:18px}
+main{flex:1;display:flex;flex-direction:column;justify-content:center}.screen{display:none;flex-direction:column;width:100%;min-width:0;animation:rise .45s cubic-bezier(.2,.7,.2,1)}.screen.active{display:flex;flex-direction:column}@keyframes cardReveal{0%{opacity:0;transform:perspective(900px) rotateX(-9deg) rotateY(5deg) translateY(22px) scale(.965);filter:blur(3px)}55%{opacity:1;filter:blur(0)}100%{opacity:1;transform:perspective(900px) rotateX(0) rotateY(0) translateY(0) scale(1)}}
+@keyframes paperFlip{0%{opacity:.75;transform:perspective(1100px) rotateY(-165deg) rotateZ(-2deg) translateY(10px)}65%{opacity:1;transform:perspective(1100px) rotateY(12deg) rotateZ(.5deg)}100%{opacity:1;transform:perspective(1100px) rotateY(0) rotateZ(0)}}
+@keyframes rise{from{opacity:0;transform:translateY(13px)}to{opacity:1;transform:translateY(0)}}
+.hero{text-align:center;padding:20px 4px 26px}.eyebrow{font-size:11px;letter-spacing:.19em;text-transform:uppercase;color:var(--muted);font-weight:700}.hero h1{font:500 clamp(42px,12vw,64px)/1.02 Georgia,serif;margin:16px 0 12px;letter-spacing:-.045em}.hero p{color:var(--muted);line-height:1.6;font-size:15px;max-width:340px;margin:0 auto}
+.leafmark{height:116px;display:grid;place-items:center;margin:4px auto 14px;position:relative;width:150px}.leafmark:before,.leafmark:after{content:"";position:absolute;width:72px;height:36px;border:1.5px solid #9aaf92;border-radius:100% 0 100% 0;transform:rotate(-35deg);opacity:.75}.leafmark:after{transform:rotate(35deg) scaleX(-1);margin-left:42px;margin-top:32px}.leafmark b{font:italic 54px Georgia,serif;color:#789276;z-index:1}
+.panel{background:rgba(251,250,245,.88);border:1px solid rgba(220,227,215,.9);border-radius:28px;padding:22px;box-shadow:var(--shadow)}
+.btn{border:0;border-radius:18px;padding:16px 20px;font-weight:700;transition:transform .2s cubic-bezier(.2,.8,.2,1),filter .2s,box-shadow .2s;min-height:54px}.btn:active{transform:scale(.98)}.primary{background:var(--accent);color:white;box-shadow:0 8px 20px rgba(85,118,90,.2)}.secondary{background:#e9eee5;color:var(--ink)}.ghost{background:transparent;border:1px solid var(--line);color:var(--ink)}.wide{width:100%}.btnrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.modes{display:grid;gap:11px}.mode{display:flex;align-items:center;gap:14px;text-align:left;background:var(--paper);border:1px solid var(--line);border-radius:20px;padding:16px;color:var(--ink)}.mode .emoji{font-size:24px;width:38px;text-align:center}.mode strong{display:block;font-size:15px}.mode small{display:block;color:var(--muted);font-size:12px;margin-top:4px;line-height:1.4}
+.sectionhead{margin:4px 0 18px}.sectionhead h2{font:500 34px/1.1 Georgia,serif;margin:9px 0}.sectionhead p{color:var(--muted);font-size:14px;line-height:1.5;margin:0}
+.category-list{display:grid;gap:9px}.cat{display:flex;justify-content:space-between;align-items:center;border:1px solid var(--line);background:var(--paper);border-radius:16px;padding:14px 15px;color:var(--ink);text-align:left}.cat small{color:var(--muted)}
+.number-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;max-height:52svh;overflow:auto;padding:2px}.number{aspect-ratio:1;border:1px solid var(--line);background:var(--paper);border-radius:13px;color:var(--ink);font-weight:650}.number.used{background:#dce8d9;border:1.5px solid #9db69a;color:#55765a;opacity:1;position:relative}.number .check{display:block;font-size:10px;line-height:1;color:#55765a;margin-top:1px}.number:disabled{cursor:not-allowed}
+.progressline{height:5px;background:#dfe6dc;border-radius:8px;overflow:hidden;margin:0 0 18px}.progressline span{height:100%;display:block;background:var(--accent2);width:0;transition:width .3s}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:30px;padding:26px 22px;box-shadow:var(--shadow);min-height:340px;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden;transform-origin:center;backface-visibility:hidden;animation:paperFlip .82s cubic-bezier(.2,.72,.2,1) both;transform-style:preserve-3d}.card:after{content:"";position:absolute;inset:0;border-radius:inherit;background:repeating-linear-gradient(135deg,rgba(120,146,118,.09) 0 1px,transparent 1px 9px),linear-gradient(145deg,#e9eee5,#dce6d9);border:1px solid #d2ddce;backface-visibility:hidden;pointer-events:none;transform:rotateY(180deg)}.card:before{content:"";position:absolute;width:190px;height:190px;border:1px solid #e2e8de;border-radius:50%;right:-95px;top:-100px}.qmeta{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:750}.qnum{font:italic 14px Georgia,serif;color:var(--accent2)}.question{font:750 clamp(27px,7.2vw,35px)/1.25 "Nunito","Arial Rounded MT Bold","Trebuchet MS",system-ui,sans-serif;letter-spacing:-.035em;margin:25px 0;position:relative;z-index:1}.hint{color:var(--muted);font-size:13px;line-height:1.5}.reveal{background:linear-gradient(145deg,#fbfaf5,#edf2e9);border:1px solid #dce5d8;border-radius:30px;padding:30px 22px;text-align:center;box-shadow:var(--shadow)}.reveal .big{font:500 37px Georgia,serif;margin:12px 0}.reveal p{color:var(--muted);font-size:14px;line-height:1.55}
+.cat-label{display:flex;align-items:center;gap:11px}.cat-icon{width:38px;height:38px;display:grid;place-items:center;border-radius:13px;background:#e9eee5;font-size:19px;flex:0 0 auto}.custom-form{display:grid;gap:10px}.custom-form label{font-size:13px;font-weight:800;color:var(--muted);margin-top:4px}.custom-form input,.custom-form textarea{width:100%;border:1px solid var(--line);border-radius:14px;background:var(--paper);color:var(--ink);padding:13px 14px;font:600 15px/1.5 "Nunito",system-ui,sans-serif;resize:vertical}.custom-form input:focus,.custom-form textarea:focus{outline:2px solid #9bb89a;outline-offset:1px}.set-actions{display:flex;gap:8px;align-items:center}.set-actions button{border:1px solid var(--line);border-radius:12px;background:var(--paper);color:var(--ink);padding:9px 11px}.footer{text-align:center;color:#879385;font-size:11px;padding-top:20px}.back{border:0;background:transparent;color:var(--muted);padding:10px 0;font-size:13px}
+.settings{display:flex;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:var(--paper);border-radius:999px;padding:10px 13px;color:var(--ink);font-size:13px}.chip.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+body.theme-sand{--bg:#f1e9dc;--paper:#fffaf2;--ink:#554333;--muted:#8b7965;--accent:#927451;--accent2:#b18c5d;--line:#e7dac8}
+body.theme-night{--bg:#17232b;--paper:#22323b;--ink:#f1eee5;--muted:#b2bdb7;--accent:#b89a63;--accent2:#d0b77f;--line:#3a4b51;--shadow:0 18px 50px rgba(0,0,0,.2)}
+body.theme-night{background:radial-gradient(ellipse at 15% 5%,#2a3c43,transparent 42%),var(--bg)}
+body.theme-night .panel,body.theme-night .mode,body.theme-night .cat,body.theme-night .number,body.theme-night .card,body.theme-night .reveal{background:var(--paper)}
+body.theme-night .secondary{background:#34474a;color:#f1eee5}body.theme-night .ghost{color:var(--ink)}
+@media(min-width:600px){.app{padding-top:28px}.hero{padding-top:32px}.card{min-height:390px;padding:34px}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation-duration:.01ms!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
+#home .hero{padding-top:12px;padding-bottom:28px}
+
+.progresslabel{display:flex;justify-content:space-between;margin-bottom:7px;color:var(--muted);font-size:12px}.number.skipped{background:#ead6ab;color:#63491f}.legend{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0;font-size:12px;color:var(--muted)}.cardtools{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}.cardtools button{font-size:22px;border:0;background:none;color:var(--accent)}.settingrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:13px 0}.settingrow select,.settingrow input{accent-color:var(--accent)}.settingrow select{background:var(--paper);color:var(--ink);border:1px solid var(--line);padding:7px;border-radius:9px}.set-actions{flex-wrap:wrap;justify-content:flex-end}.question{overflow-wrap:anywhere}.favlist{display:grid;gap:9px}.favlist .cat{gap:10px}.favlist button{flex-shrink:0}.number.used{background:var(--accent);color:white}.number.used .check{color:white}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><a class="brand-logo" href="#" data-go="home" aria-label="Ближе — на главную"><svg viewBox="0 0 160 140" aria-hidden="true"><path d="M89 42C102 28 125 33 137 48C153 68 141 97 117 100L119 117L98 101C77 100 62 85 64 66Z" fill="var(--accent)" fill-opacity=".45" stroke="var(--accent)" stroke-width="2.5" stroke-linejoin="round"/><path d="M66 23C40 19 17 36 17 59C17 74 25 85 37 92L33 108L56 96C83 100 105 83 105 60C105 41 89 26 66 23Z" fill="var(--accent)" stroke="var(--paper)" stroke-width="3.5" stroke-linejoin="round"/><circle cx="45" cy="60" r="4" fill="var(--paper)"/><circle cx="61" cy="60" r="4" fill="var(--paper)"/><circle cx="77" cy="60" r="4" fill="var(--paper)"/><circle cx="113" cy="67" r="3" fill="var(--paper)"/><circle cx="124" cy="67" r="3" fill="var(--paper)"/></svg></a><button class="iconbtn" id="settingsBtn" aria-label="Настройки">⚙</button></header>
+<main>
+<section class="screen active" id="home">
+ <div class="hero">
+  
+  <div class="eyebrow">Игра для тёплого общения</div>
+  <h1>Ближе друг<br>к другу</h1>
+  <p>Один хороший вопрос может стать началом интересной истории и помочь узнать человека лучше.</p>
+ </div>
+ <div class="modes">
+  <button class="mode" data-mode="random"><span class="emoji">✦</span><span><strong>Случайный вопрос</strong><small>Передавайте смартфон по кругу — вопросы не повторяются</small></span></button>
+  <button class="mode" data-mode="category"><span class="emoji">❋</span><span><strong>Выбрать тему</strong><small>Дружба, характер, вера, мечты и другие темы</small></span></button>
+  <button class="mode" data-mode="numbers"><span class="emoji">▦</span><span><strong>Выбрать номер</strong><small>Участник сам выбирает номер вопроса</small></span></button>
+ </div>
+ <div class="modes" style="margin-top:11px"><button class="mode" id="depthBtn"><span class="emoji">◈</span><span><strong>Глубина общения</strong><small>От знакомства до разговора по душам</small></span></button><button class="mode" id="favoritesBtn"><span class="emoji">☆</span><span><strong>Избранное</strong><small>Вопросы, которые хочется сохранить</small></span></button></div><div class="footer">110 вопросов · Без регистрации · Для хорошего общения</div>
+</section>
+<section class="screen" id="depth"><button class="back" data-go="home">← На главную</button><div class="sectionhead"><h2>Глубина общения</h2><p>Выберите настроение разговора.</p></div><div class="category-list"><button class="cat" data-depth="1">☀ Знакомимся</button><button class="cat" data-depth="2">✦ Узнаём друг друга</button><button class="cat" data-depth="3">❋ Разговор по душам</button></div></section><section class="screen" id="favorites"><button class="back" data-go="home">← На главную</button><div class="sectionhead"><h2>Избранное</h2></div><div id="favList" class="favlist"></div><button id="favSet" class="btn ghost wide" style="margin-top:12px">Создать набор из избранного</button></section><section class="screen" id="categories">
+ <button class="back" data-go="home">← На главную</button>
+ <div class="sectionhead"><div class="eyebrow">Выберите направление</div><h2>О чём поговорим?</h2><p>Можно начать с лёгкой темы или выбрать что-то более содержательное.</p></div>
+ <div class="category-list" id="categoryList"></div>
+</section>
+<section class="screen" id="customBuilder">
+ <button class="back" data-go="categories">← К темам</button>
+ <div class="sectionhead"><div class="eyebrow">Твоя коллекция</div><h2>Создать свой набор</h2><p>Придумай название и добавь вопросы — каждый с новой строки. Набор сохранится на этом устройстве.</p></div>
+ <div class="panel custom-form"><label for="setTitle">Название набора</label><input id="setTitle" maxlength="48" placeholder="Например, Воспоминания и мечты"><label for="setQuestions">Вопросы</label><textarea id="setQuestions" rows="7" placeholder="Какое воспоминание согревает тебя?&#10;Чему ты хотел бы научиться?"></textarea><div class="hint" id="customCount">Добавь минимум один вопрос.</div><button class="btn primary wide" id="saveSetBtn">Сохранить набор</button></div>
+ <div class="sectionhead" style="margin-top:24px"><h2 style="font-size:25px">Мои наборы</h2></div><div class="category-list" id="mySetsList"></div><div class="btnrow"><button class="btn ghost" id="importSet">Импорт</button><button class="btn ghost" id="exportSets">Экспорт всех</button></div><input type="file" id="setFile" accept=".json,application/json" hidden>
+</section>
+<section class="screen" id="numbers">
+ <button class="back" data-go="home">← На главную</button>
+ <div class="sectionhead"><div class="eyebrow">Выбор участника</div><h2>Выбери номер</h2><p>Использованные вопросы отмечены и не будут предложены повторно.</p></div>
+ <div class="progresslabel" id="numLabel"></div><div class="progressline"><span id="numProgress"></span></div>
+ <div class="number-grid" id="numberGrid"></div><div class="legend">✓ Ответили · ◌ Пропустили · Остальные — новые</div>
+</section>
+<section class="screen" id="ready">
+ <div class="reveal">
+  <div class="leafmark"><b>✧</b></div>
+  <div class="eyebrow">Твой ход</div>
+  <div class="big">Готов узнать<br>свой вопрос?</div>
+  <p>Когда будешь готов, нажми на кнопку. Вопрос появится на экране — поделись своей историей с остальными.</p>
+  <button class="btn primary wide" id="revealBtn">Открыть вопрос</button>
+ </div>
+</section>
+<section class="screen" id="question">
+ <div class="progresslabel" id="qLabel"></div><div class="progressline"><span id="qProgress"></span></div>
+ <div class="card">
+  <div><div class="cardtools"><span id="timerText" class="hint"></span><button id="favToggle" aria-label="Избранное">☆</button></div><div class="qmeta" id="qCategory">ТЕМА</div><div class="qnum" id="qNumber">ВОПРОС № 1</div></div>
+  <div class="question" id="qText"></div>
+  <div class="hint">Поделись своей историей или мыслями. Здесь нет правильных и неправильных ответов.</div>
+ </div>
+ <div class="btnrow"><button class="btn secondary" id="skipBtn">Другой вопрос</button><button class="btn primary" id="passBtn">Передать дальше →</button></div><button class="back" id="returnList">К списку номеров</button>
+</section>
+<section class="screen" id="settings">
+ <button class="back" data-go="home">← Назад</button>
+ <div class="sectionhead"><div class="eyebrow">Внешний вид</div><h2>Настройки</h2><p>Выберите атмосферу, которая подходит вашей встрече.</p></div>
+ <div class="panel">
+  <div class="eyebrow" style="margin-bottom:12px">Тема оформления</div>
+  <div class="settings">
+   <button class="chip" data-theme="nature">🌿 Природа</button>
+   <button class="chip" data-theme="sand">☀️ Тепло</button>
+   <button class="chip" data-theme="night">☾ Вечер</button>
+  </div>
+  <div style="height:22px"></div>
+  <div class="settingrow"><label for="soundOpt">Звук карточки</label><input type="checkbox" id="soundOpt"></div><div class="settingrow"><label for="vibOpt">Вибрация</label><input type="checkbox" id="vibOpt"></div><div class="settingrow"><label for="surpriseOpt">Карточки-сюрпризы (случайный режим)</label><input type="checkbox" id="surpriseOpt"></div><div class="settingrow"><label for="timerOpt">Таймер ответа</label><select id="timerOpt"><option value="0">Выкл.</option><option value="30">30 сек</option><option value="60">1 мин</option><option value="120">2 мин</option></select></div><button class="btn ghost wide" id="resetBtn">Сбросить текущую игру</button>
+ </div>
+ <p class="hint" style="margin-top:16px">Текущая игра сохраняется в этом браузере. Данные не отправляются на сервер.</p>
+</section>
+<section class="screen" id="done">
+ <div class="reveal">
+  <div class="leafmark"><b>♡</b></div>
+  <div class="eyebrow">Все вопросы использованы</div>
+  <div class="big">Как много историй!</div>
+  <p>Можно начать новый круг и снова открыть вопросы.</p>
+  <button class="btn primary wide" id="restartBtn">Начать заново</button>
+  <button class="btn ghost wide" style="margin-top:10px" data-go="home">На главную</button>
+ </div>
+</section>
+</main>
+</div>
+<script>
+const BASE_QUESTIONS = [
+  {
+    "id": 1,
+    "category": "Лёгкие вопросы",
+    "text": "Как выглядит твой идеальный день?"
+  },
+  {
+    "id": 2,
+    "category": "Лёгкие вопросы",
+    "text": "Что может быстро поднять тебе настроение?"
+  },
+  {
+    "id": 3,
+    "category": "Лёгкие вопросы",
+    "text": "Ты больше любишь утро или вечер? Почему?"
+  },
+  {
+    "id": 4,
+    "category": "Лёгкие вопросы",
+    "text": "Какое время года тебе нравится больше всего?"
+  },
+  {
+    "id": 5,
+    "category": "Лёгкие вопросы",
+    "text": "Без чего ты не представляешь свой обычный день?"
+  },
+  {
+    "id": 6,
+    "category": "Лёгкие вопросы",
+    "text": "Какой запах вызывает у тебя приятные воспоминания?"
+  },
+  {
+    "id": 7,
+    "category": "Лёгкие вопросы",
+    "text": "Что помогает тебе расслабиться после насыщенного дня?"
+  },
+  {
+    "id": 8,
+    "category": "Лёгкие вопросы",
+    "text": "Ты больше любишь спонтанность или заранее всё планировать?"
+  },
+  {
+    "id": 9,
+    "category": "Лёгкие вопросы",
+    "text": "Какой фильм или мультфильм ты можешь пересматривать много раз?"
+  },
+  {
+    "id": 10,
+    "category": "Лёгкие вопросы",
+    "text": "Какую музыку ты включаешь, когда хочешь поднять себе настроение?"
+  },
+  {
+    "id": 11,
+    "category": "Лёгкие вопросы",
+    "text": "Есть ли место, где ты особенно хорошо отдыхаешь душой?"
+  },
+  {
+    "id": 12,
+    "category": "Лёгкие вопросы",
+    "text": "Что у тебя получается легко, хотя другим это может даваться непросто?"
+  },
+  {
+    "id": 13,
+    "category": "Лёгкие вопросы",
+    "text": "Какой самый забавный случай произошёл с тобой за последнее время?"
+  },
+  {
+    "id": 14,
+    "category": "Лёгкие вопросы",
+    "text": "Ты больше любишь большие компании или общение один на один?"
+  },
+  {
+    "id": 15,
+    "category": "Лёгкие вопросы",
+    "text": "Что тебе чаще хочется: тишины или общения?"
+  },
+  {
+    "id": 16,
+    "category": "Интересы и увлечения",
+    "text": "Какое занятие настолько увлекает тебя, что ты забываешь о времени?"
+  },
+  {
+    "id": 17,
+    "category": "Интересы и увлечения",
+    "text": "Чему необычному ты когда-либо научился?"
+  },
+  {
+    "id": 18,
+    "category": "Интересы и увлечения",
+    "text": "Какой талант или способность ты хотел бы развить?"
+  },
+  {
+    "id": 19,
+    "category": "Интересы и увлечения",
+    "text": "Если бы у тебя появился совершенно свободный день, как бы ты его провёл?"
+  },
+  {
+    "id": 20,
+    "category": "Интересы и увлечения",
+    "text": "Какое увлечение у тебя было в детстве?"
+  },
+  {
+    "id": 21,
+    "category": "Интересы и увлечения",
+    "text": "Что ты давно хотел попробовать, но пока не представилось возможности?"
+  },
+  {
+    "id": 22,
+    "category": "Интересы и увлечения",
+    "text": "Какое блюдо ты умеешь готовить особенно хорошо?"
+  },
+  {
+    "id": 23,
+    "category": "Интересы и увлечения",
+    "text": "Есть ли у тебя необычный талант, о котором мало кто знает?"
+  },
+  {
+    "id": 24,
+    "category": "Интересы и увлечения",
+    "text": "Какое занятие ты мог бы посоветовать другим попробовать?"
+  },
+  {
+    "id": 25,
+    "category": "Интересы и увлечения",
+    "text": "Если бы можно было на месяц пожить в любой стране, какую бы ты выбрал?"
+  },
+  {
+    "id": 26,
+    "category": "Личность и характер",
+    "text": "Как бы ты описал свой характер тремя словами?"
+  },
+  {
+    "id": 27,
+    "category": "Личность и характер",
+    "text": "Какое своё качество ты особенно ценишь?"
+  },
+  {
+    "id": 28,
+    "category": "Личность и характер",
+    "text": "Какое качество характера ты хотел бы в себе развить?"
+  },
+  {
+    "id": 29,
+    "category": "Личность и характер",
+    "text": "Ты больше эмоциональный человек или сдержанный?"
+  },
+  {
+    "id": 30,
+    "category": "Личность и характер",
+    "text": "Ты обычно быстро принимаешь решения или долго обдумываешь?"
+  },
+  {
+    "id": 31,
+    "category": "Личность и характер",
+    "text": "Что помогает тебе сохранять терпение?"
+  },
+  {
+    "id": 32,
+    "category": "Личность и характер",
+    "text": "Ты больше наблюдатель или активный участник событий?"
+  },
+  {
+    "id": 33,
+    "category": "Личность и характер",
+    "text": "Любишь ли ты брать на себя ответственность?"
+  },
+  {
+    "id": 34,
+    "category": "Личность и характер",
+    "text": "Как ты обычно реагируешь на конструктивную критику?"
+  },
+  {
+    "id": 35,
+    "category": "Личность и характер",
+    "text": "В каких ситуациях ты замечаешь, что тебе ещё есть над чем работать?"
+  },
+  {
+    "id": 36,
+    "category": "Личность и характер",
+    "text": "Что окружающие не всегда правильно понимают в тебе?"
+  },
+  {
+    "id": 37,
+    "category": "Личность и характер",
+    "text": "Какое качество помогает тебе справляться с трудностями?"
+  },
+  {
+    "id": 38,
+    "category": "Личность и характер",
+    "text": "Ты больше любишь руководить или помогать другим достигать цели?"
+  },
+  {
+    "id": 39,
+    "category": "Личность и характер",
+    "text": "Что тебе помогает сохранять хорошее настроение?"
+  },
+  {
+    "id": 40,
+    "category": "Личность и характер",
+    "text": "Какую черту характера ты особенно хотел бы перенять у другого человека?"
+  },
+  {
+    "id": 41,
+    "category": "Жизненный опыт",
+    "text": "Какое событие из детства ты до сих пор вспоминаешь с улыбкой?"
+  },
+  {
+    "id": 42,
+    "category": "Жизненный опыт",
+    "text": "Какой поступок другого человека однажды произвёл на тебя сильное впечатление?"
+  },
+  {
+    "id": 43,
+    "category": "Жизненный опыт",
+    "text": "Какой совет ты когда-то получил и до сих пор помнишь?"
+  },
+  {
+    "id": 44,
+    "category": "Жизненный опыт",
+    "text": "Какую вещь ты раньше недооценивал, а теперь очень ценишь?"
+  },
+  {
+    "id": 45,
+    "category": "Жизненный опыт",
+    "text": "Какой период жизни многому тебя научил?"
+  },
+  {
+    "id": 46,
+    "category": "Жизненный опыт",
+    "text": "Какой случай заставил тебя посмотреть на что-то совершенно по-другому?"
+  },
+  {
+    "id": 47,
+    "category": "Жизненный опыт",
+    "text": "Какое решение в своей жизни ты особенно рад, что принял?"
+  },
+  {
+    "id": 48,
+    "category": "Жизненный опыт",
+    "text": "Какое неожиданное знакомство запомнилось тебе больше всего?"
+  },
+  {
+    "id": 49,
+    "category": "Жизненный опыт",
+    "text": "Если бы о твоей жизни сняли фильм, как бы ты его назвал?"
+  },
+  {
+    "id": 50,
+    "category": "Жизненный опыт",
+    "text": "Какой случай из жизни ты любишь рассказывать другим?"
+  },
+  {
+    "id": 51,
+    "category": "Дружба и отношения",
+    "text": "Какое качество ты больше всего ценишь в настоящем друге?"
+  },
+  {
+    "id": 52,
+    "category": "Дружба и отношения",
+    "text": "Как понимаешь, что человеку можно доверять?"
+  },
+  {
+    "id": 53,
+    "category": "Дружба и отношения",
+    "text": "Ты чаще любишь слушать других или рассказывать сам?"
+  },
+  {
+    "id": 54,
+    "category": "Дружба и отношения",
+    "text": "Что делает общение по-настоящему тёплым?"
+  },
+  {
+    "id": 55,
+    "category": "Дружба и отношения",
+    "text": "Какой поступок показывает тебе, что человек искренне тебя ценит?"
+  },
+  {
+    "id": 56,
+    "category": "Дружба и отношения",
+    "text": "Как ты обычно показываешь другим, что они тебе дороги?"
+  },
+  {
+    "id": 57,
+    "category": "Дружба и отношения",
+    "text": "Что помогает тебе почувствовать, что тебя действительно понимают?"
+  },
+  {
+    "id": 58,
+    "category": "Дружба и отношения",
+    "text": "Какую особенность других людей тебе пришлось учиться принимать?"
+  },
+  {
+    "id": 59,
+    "category": "Дружба и отношения",
+    "text": "Какое качество делает человека особенно привлекательным в твоих глазах?"
+  },
+  {
+    "id": 60,
+    "category": "Дружба и отношения",
+    "text": "Что, по-твоему, помогает людям разных поколений находить общий язык?"
+  },
+  {
+    "id": 61,
+    "category": "Дружба и отношения",
+    "text": "Любишь ли ты глубокие разговоры?"
+  },
+  {
+    "id": 62,
+    "category": "Дружба и отношения",
+    "text": "Какой человек может стать тебе особенно близким?"
+  },
+  {
+    "id": 63,
+    "category": "Дружба и отношения",
+    "text": "Что помогает тебе сохранять дружбу на протяжении многих лет?"
+  },
+  {
+    "id": 64,
+    "category": "Дружба и отношения",
+    "text": "Как ты считаешь, что важнее в дружбе: сходство интересов или общность взглядов?"
+  },
+  {
+    "id": 65,
+    "category": "Дружба и отношения",
+    "text": "Какой человек когда-то оказал на тебя особенно хорошее влияние?"
+  },
+  {
+    "id": 66,
+    "category": "Вера и духовная жизнь",
+    "text": "Что тебя когда-то особенно привлекло в истине?"
+  },
+  {
+    "id": 67,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой библейский стих оказал на тебя сильное влияние?"
+  },
+  {
+    "id": 68,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой духовный урок из недавнего изучения Библии тебе особенно запомнился?"
+  },
+  {
+    "id": 69,
+    "category": "Вера и духовная жизнь",
+    "text": "Какая статья, видеоматериал или программа со встречи недавно тебя особенно вдохновила?"
+  },
+  {
+    "id": 70,
+    "category": "Вера и духовная жизнь",
+    "text": "Что помогает тебе сохранять духовный настрой?"
+  },
+  {
+    "id": 71,
+    "category": "Вера и духовная жизнь",
+    "text": "Какое качество Иеговы тебе особенно близко?"
+  },
+  {
+    "id": 72,
+    "category": "Вера и духовная жизнь",
+    "text": "Когда ты особенно ощущал поддержку Иеговы?"
+  },
+  {
+    "id": 73,
+    "category": "Вера и духовная жизнь",
+    "text": "Что тебе больше всего нравится в своём собрании?"
+  },
+  {
+    "id": 74,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой случай в служении тебе особенно запомнился?"
+  },
+  {
+    "id": 75,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой библейский совет действительно помог тебе в жизни?"
+  },
+  {
+    "id": 76,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой библейский персонаж тебе особенно близок и почему?"
+  },
+  {
+    "id": 77,
+    "category": "Вера и духовная жизнь",
+    "text": "Что тебе помогает, когда духовно становится трудно?"
+  },
+  {
+    "id": 78,
+    "category": "Вера и духовная жизнь",
+    "text": "Есть ли духовная цель, над которой ты сейчас работаешь?"
+  },
+  {
+    "id": 79,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой случай из жизни единоверцев укрепил твою веру?"
+  },
+  {
+    "id": 80,
+    "category": "Вера и духовная жизнь",
+    "text": "Как ты понял, что истина стала для тебя личной?"
+  },
+  {
+    "id": 81,
+    "category": "Вера и духовная жизнь",
+    "text": "Какое качество Иеговы ты хотел бы научиться лучше проявлять в отношениях с людьми?"
+  },
+  {
+    "id": 82,
+    "category": "Вера и духовная жизнь",
+    "text": "Если бы ты мог лично поблагодарить одного из библейских персонажей, кого бы выбрал?"
+  },
+  {
+    "id": 83,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой эпизод из жизни Иисуса тебе особенно хотелось бы увидеть своими глазами?"
+  },
+  {
+    "id": 84,
+    "category": "Вера и духовная жизнь",
+    "text": "Что тебе особенно нравится в возможности служить Иегове вместе с другими?"
+  },
+  {
+    "id": 85,
+    "category": "Вера и духовная жизнь",
+    "text": "Какой библейский рассказ ты мог бы перечитывать снова и снова?"
+  },
+  {
+    "id": 86,
+    "category": "Мечты и будущее",
+    "text": "Что сейчас для тебя самое важное в жизни?"
+  },
+  {
+    "id": 87,
+    "category": "Мечты и будущее",
+    "text": "Есть ли цель, к которой ты идёшь постепенно, но настойчиво?"
+  },
+  {
+    "id": 88,
+    "category": "Мечты и будущее",
+    "text": "Чему ты хотел бы научиться в ближайший год?"
+  },
+  {
+    "id": 89,
+    "category": "Мечты и будущее",
+    "text": "Что бы ты посоветовал себе три года назад?"
+  },
+  {
+    "id": 90,
+    "category": "Мечты и будущее",
+    "text": "Как ты понимаешь, что день прошёл не зря?"
+  },
+  {
+    "id": 91,
+    "category": "Мечты и будущее",
+    "text": "Что тебе хочется сохранить в себе несмотря ни на что?"
+  },
+  {
+    "id": 92,
+    "category": "Мечты и будущее",
+    "text": "Какую мечту ты пока не осуществил?"
+  },
+  {
+    "id": 93,
+    "category": "Мечты и будущее",
+    "text": "Какое место на земле ты особенно хотел бы посетить?"
+  },
+  {
+    "id": 94,
+    "category": "Мечты и будущее",
+    "text": "Чему ты хотел бы научиться в новом мире?"
+  },
+  {
+    "id": 95,
+    "category": "Мечты и будущее",
+    "text": "Какое занятие или дело ты мечтаешь попробовать в будущем?"
+  },
+  {
+    "id": 96,
+    "category": "Тёплые и необычные",
+    "text": "Что может неожиданно растрогать тебя?"
+  },
+  {
+    "id": 97,
+    "category": "Тёплые и необычные",
+    "text": "Когда ты смеёшься по-настоящему?"
+  },
+  {
+    "id": 98,
+    "category": "Тёплые и необычные",
+    "text": "За что ты сейчас особенно благодарен?"
+  },
+  {
+    "id": 99,
+    "category": "Тёплые и необычные",
+    "text": "Какой вопрос тебе самому нравится задавать людям?"
+  },
+  {
+    "id": 100,
+    "category": "Тёплые и необычные",
+    "text": "Какое небольшое проявление доброты ты никогда не забывал?"
+  },
+  {
+    "id": 101,
+    "category": "Тёплые и необычные",
+    "text": "Если бы можно было снова пережить один счастливый день из своей жизни, какой бы ты выбрал?"
+  },
+  {
+    "id": 102,
+    "category": "Тёплые и необычные",
+    "text": "С каким известным человеком прошлого тебе было бы интересно поговорить?"
+  },
+  {
+    "id": 103,
+    "category": "Тёплые и необычные",
+    "text": "Какой совет ты хотел бы передать молодому поколению?"
+  },
+  {
+    "id": 104,
+    "category": "Тёплые и необычные",
+    "text": "Что ты давно хотел сказать кому-то, но пока не находил подходящего момента?"
+  },
+  {
+    "id": 105,
+    "category": "Тёплые и необычные",
+    "text": "Какое простое удовольствие делает твою жизнь приятнее?"
+  },
+  {
+    "id": 106,
+    "category": "Тёплые и необычные",
+    "text": "Если бы у тебя была возможность организовать незабываемую встречу для друзей, что бы ты придумал?"
+  },
+  {
+    "id": 107,
+    "category": "Тёплые и необычные",
+    "text": "Какое качество в людях всегда вызывает у тебя уважение?"
+  },
+  {
+    "id": 108,
+    "category": "Тёплые и необычные",
+    "text": "Что ты хотел бы, чтобы люди вспоминали о тебе с теплотой?"
+  },
+  {
+    "id": 109,
+    "category": "Тёплые и необычные",
+    "text": "Какое обещание Иеговы ты особенно ждёшь увидеть исполненным?"
+  },
+  {
+    "id": 110,
+    "category": "Тёплые и необычные",
+    "text": "Какой вопрос ты хотел бы задать человеку, которого хочешь узнать поближе?"
+  }
+];
+const KEY = "blizhe-session-v1", THEME_KEY = "blizhe-theme-v1", SETS_KEY = "blizhe-custom-sets-v1";
+let customSets = loadSets();
+let QUESTIONS = [...BASE_QUESTIONS, ...customSets.flatMap((s,si)=>s.questions.map((text,qi)=>({id:Number(s.id.replace(/\D/g,""))*100+qi,category:s.title,text,custom:true,setId:s.id,localNumber:qi+1})))];
+const $ = s => document.querySelector(s);
+let state = loadState(), pendingId = null, mode = "random", chosenCategory = null;
+function loadSets(){try{return JSON.parse(localStorage.getItem(SETS_KEY))||[]}catch{return []}}
+function persistSets(){localStorage.setItem(SETS_KEY,JSON.stringify(customSets));QUESTIONS=[...BASE_QUESTIONS,...customSets.flatMap((s,si)=>s.questions.map((text,qi)=>({id:Number(s.id.replace(/\D/g,""))*100+qi,category:s.title,text,custom:true,setId:s.id,localNumber:qi+1})))];renderCategories();renderMySets();updateProgress()}
+function fresh(){return {used:[],skipped:[],current:null,mode:"random",category:null}}
+function loadState(){try{return {...fresh(),...(JSON.parse(localStorage.getItem(KEY)||sessionStorage.getItem(KEY))||{})}}catch{return fresh()}}
+function save(){localStorage.setItem(KEY,JSON.stringify(state));updateProgress()}
+function show(id){if(id!=="question")clearInterval(timerHandle);document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$("#"+id).classList.add("active");window.scrollTo({top:0,behavior:"smooth"})}
+function unused(list=QUESTIONS){return list.filter(q=>!state.used.includes(q.id))}
+function pool(){return mode==="category"?QUESTIONS.filter(q=>q.category===chosenCategory):mode==="depth"?BASE_QUESTIONS.filter(q=>depthOf(q)===chosenCategory):BASE_QUESTIONS}
+function depthOf(q){return ["Лёгкие вопросы","Интересы и увлечения"].includes(q.category)?1:["Вера и духовная жизнь","Мечты и будущее","Жизненный опыт"].includes(q.category)?3:2}
+function pickRandom(list=QUESTIONS){const available=unused(list);const fresh=available.filter(q=>!state.skipped.includes(q.id));const a=fresh.length?fresh:available;if(!a.length)return null;return a[Math.floor(Math.random()*a.length)]}
+function beginRandom(){mode="random";state.mode=mode;state.category=null;pendingId=null;save();if(!unused(pool()).length){show("done");return}show("ready")}
+function beginCategory(cat){mode="category";chosenCategory=cat;state.mode=mode;state.category=cat;pendingId=null;save();if(!unused(QUESTIONS.filter(q=>q.category===cat)).length){alert("В этой теме вопросы закончились. Выберите другую тему или начните игру заново.");return}show("ready")}
+function selectPending(q){if(!q)return;pendingId=q.id;state.current=q.id;save();show("ready")}
+function reveal(){let q=pendingId!==null?QUESTIONS.find(x=>x.id===pendingId):null;if(!q)q=pickRandom(pool());if(!q){show("done");return}state.current=q.id;pendingId=q.id;save();const surprise=mode==="random"&&opts.surpriseOpt&&Math.random()<.12;isSurprise=surprise;$("#qCategory").textContent=surprise?"КАРТОЧКА-СЮРПРИЗ":q.category.toUpperCase();$("#qNumber").textContent=surprise?"Особый момент":"ВОПРОС № "+(q.localNumber||q.id);$("#qText").textContent=surprise?surprises[Math.floor(Math.random()*surprises.length)]:q.text;$("#favToggle").hidden=surprise;refreshFav();$("#skipBtn").textContent="Пропустить";$("#passBtn").textContent="Ответили ✓";$("#returnList").hidden=mode!=="numbers";updateProgress();show("question");feedback();startTimer()}
+function nextTurn(){pendingId=null;state.current=null;save();if(mode==="numbers"){renderNumbers();show("numbers");return}if(!unused(pool()).length){show("done");return}show("ready")}
+function finish(answered){const id=state.current;if(id!==null&&!isSurprise){if(answered){state.used=[...new Set([...state.used,id])];state.skipped=state.skipped.filter(x=>x!==id)}else state.skipped=[...new Set([...state.skipped,id])]}nextTurn()}
+function updateProgress(){const list=mode==="numbers"?BASE_QUESTIONS:pool();const done=list.filter(q=>state.used.includes(q.id)).length;const p=list.length?Math.round(done/list.length*100):0;for(const key of ["num","q"]){$("#"+key+"Progress").style.width=p+"%";$("#"+key+"Label").textContent=`Пройдено ${done} из ${list.length} · ${p}%`}}
+function categoryIcon(c){if(c.includes("Лёгкие"))return "☀️";if(c.includes("Интересы"))return "✦";if(c.includes("Личность"))return "🪞";if(c.includes("Друж"))return "🤝";if(c.includes("Сем"))return "🏡";if(c.includes("Вера"))return "🌿";if(c.includes("Меч"))return "✨";if(c.includes("Тёпл"))return "💛";return "❋"}
+function renderCategories(){const cats=[...new Set(QUESTIONS.map(q=>q.category))];$("#categoryList").innerHTML=cats.map(c=>`<button class="cat" data-cat="${escapeHtml(c)}"><span class="cat-label"><span class="cat-icon">${categoryIcon(c)}</span><span>${escapeHtml(c)}</span></span><small>${QUESTIONS.filter(q=>q.category===c).length} вопросов　→</small></button>`).join("")+`<button class="cat" id="openCustom"><span class="cat-label"><span class="cat-icon">＋</span><span>Создать свой набор</span></span><small>Добавить вопросы　→</small></button>`;document.querySelectorAll("[data-cat]").forEach(b=>b.onclick=()=>beginCategory(b.dataset.cat));$("#openCustom").onclick=()=>{renderMySets();show("customBuilder")}}
+function renderMySets(){const el=$("#mySetsList");if(!el)return;el.innerHTML=customSets.length?customSets.map(s=>`<div class="cat"><span><strong>${escapeHtml(s.title)}</strong><br><small>${s.questions.length} вопросов</small></span><span class="set-actions"><button data-play-set="${s.id}">Играть →</button><button data-edit-set="${s.id}">✎</button><button data-share-set="${s.id}">↗</button><button data-delete-set="${s.id}" aria-label="Удалить набор">✕</button></span></div>`).join(""):`<p class="hint">Пока нет собственных наборов. Создай первый выше.</p>`;el.querySelectorAll("[data-play-set]").forEach(b=>b.onclick=()=>beginCategory(customSets.find(s=>s.id===b.dataset.playSet).title));el.querySelectorAll("[data-edit-set]").forEach(b=>b.onclick=()=>{const s=customSets.find(x=>x.id===b.dataset.editSet);editing=s.id;$("#setTitle").value=s.title;$("#setQuestions").value=s.questions.join("\n");$("#saveSetBtn").textContent="Сохранить изменения";window.scrollTo(0,0)});el.querySelectorAll("[data-share-set]").forEach(b=>b.onclick=()=>shareSet(customSets.find(x=>x.id===b.dataset.shareSet)));el.querySelectorAll("[data-delete-set]").forEach(b=>b.onclick=()=>{if(confirm("Удалить этот набор вопросов?")){customSets=customSets.filter(s=>s.id!==b.dataset.deleteSet);persistSets()}})}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function renderNumbers(){const grid=$("#numberGrid");grid.innerHTML=BASE_QUESTIONS.map(q=>{const used=state.used.includes(q.id);return `<button class="number ${used?"used":state.skipped.includes(q.id)?"skipped":""}" data-id="${q.id}" ${used?"disabled":""}>${q.custom?q.localNumber:q.id}${used?`<span class="check">✓</span>`:state.skipped.includes(q.id)?" ◌":""}</button>`}).join("");grid.querySelectorAll("[data-id]").forEach(b=>b.onclick=()=>{mode="numbers";pendingId=Number(b.dataset.id);state.mode=mode;save();reveal()});updateProgress()}
+function applyTheme(t){document.body.classList.remove("theme-sand","theme-night");if(t==="sand")document.body.classList.add("theme-sand");if(t==="night")document.body.classList.add("theme-night");localStorage.setItem(THEME_KEY,t);document.querySelectorAll("[data-theme]").forEach(b=>b.classList.toggle("active",b.dataset.theme===t))}
+document.querySelectorAll("[data-mode]").forEach(b=>b.onclick=()=>{const m=b.dataset.mode;if(m==="random")beginRandom();if(m==="category"){renderCategories();show("categories")}if(m==="numbers"){mode="numbers";state.mode=mode;renderNumbers();show("numbers")}});
+document.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>show(b.dataset.go));
+$("#revealBtn").onclick=reveal;$("#passBtn").onclick=()=>finish(true);$("#skipBtn").onclick=()=>finish(false);$("#returnList").onclick=nextTurn;
+$("#settingsBtn").onclick=()=>show("settings");
+document.querySelectorAll("[data-theme]").forEach(b=>b.onclick=()=>applyTheme(b.dataset.theme));
+$("#resetBtn").onclick=()=>{if(confirm("Начать игру заново? Список использованных вопросов будет очищен.")){state=fresh();mode="random";pendingId=null;save();renderNumbers();show("home")}};
+$("#restartBtn").onclick=()=>{state=fresh();mode="random";pendingId=null;save();show("home")};
+$("#setQuestions").addEventListener("input",()=>{const n=$("#setQuestions").value.split("\n").map(x=>x.trim()).filter(Boolean).length;$("#customCount").textContent=n?`Будет добавлено вопросов: ${n}`:"Добавь минимум один вопрос."});
+$("#saveSetBtn").onclick=()=>{const title=$("#setTitle").value.trim();const questions=$("#setQuestions").value.split("\n").map(x=>x.trim()).filter(Boolean);if(!title){alert("Дай набору название.");$("#setTitle").focus();return}if(questions.length>100){alert("Максимум 100 вопросов в наборе.");return}if(!questions.length){alert("Добавь хотя бы один вопрос.");$("#setQuestions").focus();return}if(customSets.some(s=>s.id!==editing&&s.title.toLocaleLowerCase()===title.toLocaleLowerCase())||BASE_QUESTIONS.some(q=>q.category.toLowerCase()===title.toLowerCase())){alert("Набор с таким названием уже есть. Выбери другое.");return}if(editing){customSets=customSets.filter(s=>s.id!==editing);editing=null}customSets.push({id:"set-"+Date.now(),title,questions});$("#saveSetBtn").textContent="Сохранить набор";persistSets();$("#setTitle").value="";$("#setQuestions").value="";$("#customCount").textContent="Набор сохранён. Можно создать ещё один.";renderMySets()};
+let timerHandle,editing=null,isSurprise=false;const surprises=["Расскажи смешную историю из жизни.","Скажи человеку справа, какое качество ты в нём ценишь.","Поделись одним приятным событием этой недели.","Расскажи, кому ты особенно благодарен и почему."];
+let opts={};try{opts=JSON.parse(localStorage.getItem("blizhe-options")||"{}")||{}}catch{};let fav=[];try{fav=JSON.parse(localStorage.getItem("blizhe-favorites")||"[]")}catch{}
+for(const k of ["soundOpt","vibOpt","surpriseOpt","timerOpt"]){const el=$("#"+k);if(k==="timerOpt")el.value=opts[k]||0;else el.checked=!!opts[k];el.onchange=()=>{opts[k]=k==="timerOpt"?Number(el.value):el.checked;localStorage.setItem("blizhe-options",JSON.stringify(opts))}}
+function feedback(){if(opts.vibOpt)navigator.vibrate?.(25);if(opts.soundOpt){try{const A=window.AudioContext||window.webkitAudioContext;const a=new A();const b=a.createBuffer(1,a.sampleRate*.13,a.sampleRate);const d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*.12*(1-i/d.length);const s=a.createBufferSource();s.buffer=b;const filter=a.createBiquadFilter();filter.type="lowpass";filter.frequency.value=1800;s.connect(filter).connect(a.destination);s.start();s.onended=()=>a.close()}catch{}}}
+function startTimer(){clearInterval(timerHandle);let n=Number(opts.timerOpt)||0;$("#timerText").textContent=n?`◷ ${n} сек`:"";if(n)timerHandle=setInterval(()=>{n--;$("#timerText").textContent=n?`◷ ${n} сек`:"Время вышло — можно продолжать";if(!n)clearInterval(timerHandle)},1000)}
+function refreshFav(){$("#favToggle").textContent=fav.some(q=>q.id===state.current)?"★":"☆"}
+function saveFav(){localStorage.setItem("blizhe-favorites",JSON.stringify(fav));refreshFav()}
+$("#favToggle").onclick=()=>{const q=QUESTIONS.find(x=>x.id===state.current);if(!q)return;if(fav.some(x=>x.id===q.id))fav=fav.filter(x=>x.id!==q.id);else fav.push({id:q.id,text:q.text});saveFav()};
+function renderFav(){$("#favList").innerHTML=fav.map((q,i)=>`<div class="cat"><span>${escapeHtml(q.text)}</span><button class="chip" data-remove="${i}">✕</button></div>`).join("")||"<p class='hint'>Пока нет избранных вопросов.</p>";document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{fav.splice(Number(b.dataset.remove),1);saveFav();renderFav()});$("#favSet").disabled=!fav.length}
+$("#favoritesBtn").onclick=()=>{renderFav();show("favorites")};$("#favSet").onclick=()=>{editing=null;$("#setTitle").value="Избранное";$("#setQuestions").value=fav.map(q=>q.text).join("\n");show("customBuilder")};$("#depthBtn").onclick=()=>show("depth");document.querySelectorAll("[data-depth]").forEach(b=>b.onclick=()=>{mode="depth";chosenCategory=Number(b.dataset.depth);pendingId=null;state.mode=mode;state.category=chosenCategory;state.current=null;save();show(unused(pool()).length?"ready":"done")});
+function downloadSets(sets){const blob=new Blob([JSON.stringify({version:1,sets:sets.map(({title,questions})=>({title,questions}))},null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download="blizhe-sets.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+async function shareSet(s){const file=new File([JSON.stringify({version:1,sets:[{title:s.title,questions:s.questions}]})],"blizhe-set.json",{type:"application/json"});try{if(navigator.canShare?.({files:[file]})){await navigator.share({files:[file]});return}}catch(e){if(e.name==="AbortError")return}downloadSets([s])}
+$("#exportSets").onclick=()=>downloadSets(customSets);$("#importSet").onclick=()=>$("#setFile").click();$("#setFile").onchange=async()=>{try{const data=JSON.parse(await $("#setFile").files[0].text());if(!Array.isArray(data.sets)||!data.sets.length||data.sets.some(s=>typeof s.title!=="string"||!s.title.trim()||!Array.isArray(s.questions)||!s.questions.length||s.questions.length>100||s.questions.some(q=>typeof q!=="string"||!q.trim())))throw Error();let id=Date.now();for(const s of data.sets){let title=s.title.trim().slice(0,48);while(customSets.some(x=>x.title.toLowerCase()===title.toLowerCase())||BASE_QUESTIONS.some(q=>q.category.toLowerCase()===title.toLowerCase()))title+=" (копия)";customSets.push({id:"set-"+id++,title,questions:s.questions.map(q=>q.trim())})}persistSets()}catch{alert("Не удалось импортировать набор. Проверьте JSON-файл.")}$("#setFile").value=""};
+if(location.protocol==="https:"||location.hostname==="localhost")navigator.serviceWorker?.register("sw.js").catch(()=>{});
+applyTheme(localStorage.getItem(THEME_KEY)||"nature");renderCategories();renderMySets();updateProgress();
+// Restore an unfinished session gracefully: the current question is not shown until the participant taps.
+if(state.current){pendingId=state.current;mode=state.mode||"random";chosenCategory=state.category;show("ready")}
+</script>
+</body>
+</html>
